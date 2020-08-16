@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { ArrowLeftOutlined } from '@ant-design/icons'
-import { Table, Button, Modal, Input } from 'antd';
+import { Table, Button, Modal, Input, message } from 'antd';
 
 class UserPage extends Component {
     index = -1;
@@ -47,6 +47,7 @@ class UserPage extends Component {
             return {
                 key: index + 1,
                 name: products[entry.productIndex].name,
+                amount: entry.amount,
                 approved: entry.isApproved,
                 rejected: entry.isRejected,
                 time: this.convertTimestamp(parseInt(entry.time))
@@ -57,13 +58,13 @@ class UserPage extends Component {
 
     render() {
         return (
-            <div style={{flexGrow: 1}}>
+            <div style={{flexGrow: 1, marginTop: 5}}>
                 <div style={{display: "flex", justifyContent: "space-between"}}>
-                    <ArrowLeftOutlined onClick={this.props.onBack} style={{fontSize: 24, marginLeft: 10, marginTop: 10}}/>
-                    <span style={{marginRight: 10, marginTop: 10}}><b>Balance: </b>{this.props.balance} eth</span>
+                    <div style={{width: 300}}><ArrowLeftOutlined onClick={this.props.onBack} style={{fontSize: 32, marginLeft: 15, marginTop: 10}}/></div>
+                    <div style={{width: 300}}><h1 style={{textAlign: "center"}}>User View</h1></div>
+                    <div style={{width: 300}}><div style={{padding: "10px 10px 0px 50px"}}><b>Balance: </b>{this.props.balance} ETH</div></div>
                 </div>
                 <div style={{textAlign:"center"}}>
-                    <h1>User Page</h1>
                     <div style={{display: "flex"}}>
                         <div style={{marginLeft: 10, marginRight: 10, flexGrow: 1}}>
                             <Table 
@@ -73,7 +74,7 @@ class UserPage extends Component {
                                 loading={this.state.isInsuranceLoading}
                                 pagination={false}
                                 bordered
-                                scroll={{y: 280}}
+                                scroll={{y: 320}}
                             />
                         </div>
                         <div style={{marginLeft: 10, marginRight: 10, flexGrow: 1}}>
@@ -84,7 +85,7 @@ class UserPage extends Component {
                                 loading={this.state.isClaimsLoading}
                                 pagination={false}
                                 bordered
-                                scroll={{y: 280}}
+                                scroll={{y: 320}}
                             />
                         </div>
                     </div>
@@ -97,9 +98,9 @@ class UserPage extends Component {
     getInsuranceColumns = () => {
         return [
             {
-                title: 'Index',
+                title: 'ID',
                 dataIndex: 'key',
-                width: 80
+                width: 60
             },
             {
                 title: 'Name',
@@ -124,21 +125,20 @@ class UserPage extends Component {
                     }
                     return (
                         <div>
-                            <div><b>Premium: </b>{`${record.premium} eth`}</div>
-                            <div><b>Aggregate amount: </b>{`${record.amount} eth`}</div>
+                            <div><b>Premium: </b>{`${record.premium} ETH`}</div>
+                            <div><b>Aggregate amount: </b>{`${record.amount} ETH`}</div>
                             <div style={{marginTop: 5}}>
-                                { !record.claimed && (
-                                    <Button
-                                        style={{marginRight: 10}}
-                                        onClick={() => {
-                                            this.index = index;
-                                            this.setState({ claimDialog: true, value: '' })
-                                        }}
-                                    >Claim</Button> 
-                                )}
+                                <Button
+                                    style={{marginRight: 10}}
+                                    onClick={() => {
+                                        this.index = index;
+                                        this.setState({ claimDialog: true, value: '' })
+                                    }}
+                                    disabled={record.claimed}
+                                >Raise a claim</Button>
                                 <Button
                                     type='primary'
-                                    style={{backgroundColor: "#52c41a"}}
+                                    style={{backgroundColor: "#52c41a", borderColor: "#52c41a"}}
                                     onClick={() => {
                                         this.index = index;
                                         this.setState({ payDialog: true, value: '' })
@@ -157,7 +157,7 @@ class UserPage extends Component {
     getClaimsColumns = () => {
         return [
             {
-                title: 'Index',
+                title: 'Claim ID',
                 dataIndex: 'key',
                 width: 80
             },
@@ -167,18 +167,25 @@ class UserPage extends Component {
                 width: 150
             },
             {
+                title: 'Amount',
+                dataIndex: 'amount',
+                width: 100,
+                render: (text) => `${text} ETH`
+            },
+            {
                 title: 'Status',
                 dataIndex: 'approved',
                 key: 'status',
                 render: (text, record) => {
                     if (record.approved) {
-                        return <div>Approved</div>
+                        return <div style={{color: "#7cb305"}}>Approved</div>
                     } else if (record.rejected) {
-                        return <div>Rejected</div>
+                        return <div style={{color: "#ff4d4f"}}>Rejected</div>
                     } else {
-                        return <div>Pending</div>
+                        return <div style={{color: "#d4b106"}}>Pending</div>
                     }
-                }
+                },
+                width: 120
             },
             {
                 title: 'Last updated',
@@ -189,6 +196,10 @@ class UserPage extends Component {
     }
 
     applyClaim = async () => {
+        if (isNaN(this.state.value)) {
+            message.error('Invalid amount');
+            return;
+        }
         this.setState({ isLoading: true });
         await this.props.contract.methods.claimInsurance(this.index, parseInt(this.state.value)).send({ from: this.props.account });
         this.setState({ isLoading: false, claimDialog: false });
@@ -197,6 +208,14 @@ class UserPage extends Component {
     }
 
     payPremium = async () => {
+        if (isNaN(this.state.value)) {
+            message.error('Invalid amount');
+            return;
+        }
+        if (parseFloat(this.state.value) < parseFloat(this.state.insurance[this.index].premium)) {
+            message.error('Amount less than minimum payable');
+            return;
+        }
         this.setState({ isLoading: true });
         await this.props.contract.methods.payPremium(this.index).send({ from: this.props.account, value: this.props.web3.utils.toWei(this.state.value) });
         this.setState({ isLoading: false, payDialog: false });
@@ -205,6 +224,10 @@ class UserPage extends Component {
     }
 
     buyInsurance = async () => {
+        if (isNaN(this.state.value)) {
+            message.error('Invalid amount');
+            return;
+        }
         this.setState({ isLoading: true });
         await this.props.contract.methods.buyInsurance(this.index, this.props.web3.utils.toWei(this.state.value)).send({ from: this.props.account });
         this.setState({ isLoading: false, buyDialog: false });
@@ -213,46 +236,40 @@ class UserPage extends Component {
     }
 
     getModal = () => {
-        if (this.state.claimDialog) {
-            return (
+        return (
+            <div>
                 <Modal
                     title={'Apply for a claim'}
-                    visible={true}
+                    visible={this.state.claimDialog}
                     onOk={this.applyClaim}
                     onCancel={() => this.setState({ claimDialog: false })}
                     confirmLoading={this.state.isLoading}
                 >
-                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1}}>Claim amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'eth'}/></div>
+                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Claim amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
                 </Modal>
-            )
-        } else if (this.state.payDialog) {
-            return (
                 <Modal
                     title={'Pay premium'}
-                    visible={true}
+                    visible={this.state.payDialog}
                     onOk={this.payPremium}
                     onCancel={() => this.setState({ payDialog: false })}
                     confirmLoading={this.state.isLoading}
                 >
-                    <div style={{display: "flex"}}><div style={{flexGrow: 1, fontWeight: 700}}>Minimum payable: </div>{this.state.insurance[this.index].premium} eth</div>
-                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Claim amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'eth'}/></div>
+                    <div style={{display: "flex"}}><div style={{flexGrow: 1, fontWeight: 700}}>Minimum payable: </div>{this.state.insurance[this.index] ? this.state.insurance[this.index].premium : null} ETH</div>
+                    <div style={{display: "flex", marginTop: 4}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Premium amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
                 </Modal>
-            )
-        } else if (this.state.buyDialog) {
-            return (
                 <Modal
                     title={'Buy insurance'}
-                    visible={true}
+                    visible={this.state.buyDialog}
                     onOk={this.buyInsurance}
                     onCancel={() => this.setState({ buyDialog: false })}
                     confirmLoading={this.state.isLoading}
                 >
-                    <div style={{display: "flex"}}><div style={{flexGrow: 1, fontWeight: 700}}>Name</div>{this.state.insurance[this.index].name}</div>
-                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Set premium</div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'eth'}/></div>
+                    <div style={{display: "flex"}}><div style={{flexGrow: 1, fontWeight: 700}}>Product Name:</div>{this.state.insurance[this.index] ? this.state.insurance[this.index].name : null}</div>
+                    <div style={{display: "flex", marginTop: 4}}><div style={{flexGrow: 1, fontWeight: 700}}>Product ID:</div>{this.index + 1}</div>
+                    <div style={{display: "flex", marginTop: 4}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Set premium:</div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
                 </Modal>
-            )
-        }        
-        return null;
+            </div>
+        );
     }
 
     convertTimestamp = (timestamp) => {
