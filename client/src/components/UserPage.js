@@ -56,9 +56,9 @@ class UserPage extends Component {
 
     render() {
         return (
-            <div style={{flexGrow: 1}}>
+            <div style={{flexGrow: 1, marginTop: 5}}>
                 <div style={{display: "flex", justifyContent: "space-between"}}>
-                    <div style={{width: 300}}><ArrowLeftOutlined onClick={this.props.onBack} style={{fontSize: 32, marginLeft: 10, marginTop: 10}}/></div>
+                    <div style={{width: 300}}><ArrowLeftOutlined onClick={this.props.onBack} style={{fontSize: 32, marginLeft: 15, marginTop: 10}}/></div>
                     <div style={{width: 300}}><h1 style={{textAlign: "center"}}>User View</h1></div>
                     <div style={{width: 300}}><div style={{padding: "10px 10px 0px 50px"}}><b>Balance: </b>{this.props.balance} ETH</div></div>
                 </div>
@@ -96,9 +96,9 @@ class UserPage extends Component {
     getInsuranceColumns = () => {
         return [
             {
-                title: 'Index',
+                title: 'ID',
                 dataIndex: 'key',
-                width: 80
+                width: 60
             },
             {
                 title: 'Name',
@@ -155,7 +155,7 @@ class UserPage extends Component {
     getClaimsColumns = () => {
         return [
             {
-                title: 'Index',
+                title: 'Claim ID',
                 dataIndex: 'key',
                 width: 80
             },
