@@ -15,7 +15,10 @@ class OwnerPage extends Component {
             ModalText: 'Content of the modal',
             visible: false,
             confirmLoading: false,
-            isInsuranceLoading:false
+            isInsuranceLoading:false,
+            isProductLoading: false,
+            isRedeemLoading: false,
+            isDepositLoading: false
         }
     }
 
@@ -52,18 +55,24 @@ class OwnerPage extends Component {
 
     addFunds=()=>{
         const {account,contract} = this.props;
-        console.log(typeof(this.state.amountToLoad));
-        var amount = this.props.web3.utils.toWei(this.state.amountToLoad,'ether')
-        contract.methods.addFunds().send({from:account,value:amount}).then(resp=>{
-            this.setState({amountToLoad:0})
-            this.getContractBalance();
-            this.props.updateBalance();
-        })
-        .catch(err=>{
-            alert(err.message);
-            this.setState({amountToLoad:0})
-            console.log(err);
-        })
+        this.setState({isDepositLoading:true});
+        if(this.state.amountToLoad!==0){
+            var amount = this.props.web3.utils.toWei(this.state.amountToLoad,'ether')
+            contract.methods.addFunds().send({from:account,value:amount}).then(resp=>{
+                this.getContractBalance();
+                this.props.updateBalance();
+                this.setState({isDepositLoading:false,amountToLoad:0});
+            })
+            .catch(err=>{
+                this.setState({isDepositLoading:false,amountToLoad:0});
+                alert(err.message);
+                console.log(err);
+            })
+        }
+        else{
+            this.setState({isDepositLoading:false});
+            alert("Amount cannot be empty!")
+        }
     }
 
     getInsuranceColumns=()=>{
@@ -83,12 +92,22 @@ class OwnerPage extends Component {
 
     addProduct = async () =>{
         const {account,contract} = this.props;
+        this.setState({isProductLoading:true});
         if(this.state.productToAdd!=="")
             contract.methods.addProduct(this.state.productToAdd).send({from:account}).then(resp=>{
                 this.setState({productToAdd:""});
                 this.updateData();
                 this.props.updateBalance();
+                this.setState({isProductLoading:false});
             })
+            .catch(err=>{
+                alert(err.message);
+                this.setState({isProductLoading:false});
+            })
+        else{
+            alert("Product name cannot be empty!");
+            this.setState({isProductLoading:false});
+        }
     }
 
     updateData= async ()=>{
@@ -107,11 +126,14 @@ class OwnerPage extends Component {
 
     transferToOwner=()=>{
         const {account,contract} = this.props;
+        this.setState({isRedeemLoading:true});
         contract.methods.transferToOwner().send({from:account}).then(resp=>{
             this.getContractBalance();
             this.props.updateBalance();
+            this.setState({isRedeemLoading:false});
         })
         .catch(err =>{
+            this.setState({isRedeemLoading:false});
             alert("Insufficient Balance");
         })
     }
@@ -140,7 +162,7 @@ class OwnerPage extends Component {
                                                     />
                                                 </Col>
                                                 <Col>
-                                                    <Button style={{backgroundColor:"#0ad48b"}} onClick={this.addFunds}>Deposit Ether</Button>
+                                                    <Button loading={this.state.isDepositLoading} type="primary" style={{backgroundColor: "#52c41a", borderColor: "#52c41a"}} onClick={this.addFunds}>Deposit Ether</Button>
                                                 </Col>
                                     </Space>
                                     <p style={{color:"#dddddd"}}>Money will be trasnfered from <b>Your account</b> to <b>Contract</b></p>            
@@ -149,7 +171,7 @@ class OwnerPage extends Component {
                                 <Grid item style={{textAlign:"center",backgroundColor:"#096dd9"}}>
                                     <h2 style={{fontSize:"35px",lineHeight:0.1,color:"#ffffff"}}>{this.state.contractBalance.toFixed(3)} <span style={{fontSize:"15px"}}>ETH</span></h2>
                                     <p style={{color:"#fcfcfc"}}>Contract Balance</p>
-                                    <Button style={{backgroundColor:"#0ad48b"}} onClick={this.transferToOwner}>Redeem</Button>
+                                    <Button loading={this.state.isRedeemLoading} type="primary" style={{backgroundColor: "#52c41a", borderColor: "#52c41a"}} onClick={this.transferToOwner}>Redeem</Button>
                                     <p style={{color:"#dddddd"}}>Money will be trasnfered from <b>Contract</b> to <b>Your account</b></p>  
                                 </Grid>
                             </Grid>
@@ -177,7 +199,7 @@ class OwnerPage extends Component {
                                                     />
                                                 </Col>
                                                 <Col>
-                                                    <Button type="primary" onClick={this.addProduct}>Add Product</Button>
+                                                    <Button loading={this.state.isProductLoading} type="primary"  onClick={this.addProduct}>Add Product</Button>
                                                 </Col>
                                             </Space>
                                         </Row>

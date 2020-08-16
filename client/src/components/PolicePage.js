@@ -7,7 +7,9 @@ class PolicePage extends Component {
         super(props);
         this.state={
             claims: [],
-            isClaimsLoading: false
+            isClaimsLoading: false,
+            isRejectLoading: false,
+            isApproveLoading: false
         }
     }
 
@@ -122,10 +124,10 @@ class PolicePage extends Component {
                     <Row>
                         <Space>
                             <Col>
-                                <Button type="primary" onClick={()=>this.takeAction("approve",record)}>Approve</Button>
+                                <Button type="primary" style={{backgroundColor: "#52c41a", borderColor: "#52c41a"}} onClick={()=>this.takeAction("approve",record)}>Approve</Button>
                             </Col>
                             <Col>
-                            <Button type="primary" onClick={()=>this.takeAction("reject",record)}>Reject</Button>
+                            <Button type="primary" style={{backgroundColor: "#ff0033", borderColor: "#ff0033"}} onClick={()=>this.takeAction("reject",record)}>Reject</Button>
                             </Col>
                         </Space>
                     </Row>)
