@@ -93,7 +93,7 @@ class App extends Component {
       const ethereum = window.ethereum;
       if(ethereum){
         ethereum.on('accountsChanged',async (accounts)=>{
-          this.setState({account:accounts[0]},this.updateBalance);
+          this.setState({account:accounts[0]}, () => {this.updateBalance();});
         })
       }
       return(
