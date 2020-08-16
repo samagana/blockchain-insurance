@@ -12,7 +12,7 @@ import BlockExplorer from "./components/BlockExplorer";
 import "./App.css";
 import "antd/dist/antd.css"
 
-const antIcon = <LoadingOutlined style={{ fontSize: 32 }} spin />;
+const antIcon = <LoadingOutlined style={{ fontSize: 48 }} spin />;
 
 class App extends Component {
   state = { balance: 0, web3: null, account: null, contract: null ,loggedIn: false , type: ""};
@@ -69,10 +69,10 @@ class App extends Component {
         return (
           <div className="App-header">
             <h1>Welcome to <b style={{color:"#7cb305"}}>In-Sol-Ution</b></h1>
-            <p>A simple Insurance system built with the technology of blockchain</p>
-            <h2>We use <b style={{color:"#7cb305"}}>Metamask</b> as our Web3 provider</h2>
-            <p>You can change the account whenever required and we will update the same in our application</p>
-            <div>User: <b style={{color:"#7cb305"}}>{this.state.account}</b> Balance:  <b style={{color:"#7cb305"}}>{this.state.balance} ETH</b></div>
+            <p>A simple insurance system built with the technology of <b>blockchain</b></p>
+            <h2>We use <b style={{color:"#faad14"}}>Metamask</b> as our Web3 provider</h2>
+            <p>You can change the account whenever required and we will automatically update the same in our application</p>
+            <div><b>User: </b><b style={{color:"#7cb305"}}>{this.state.account}</b><b>, Balance:  </b><b style={{color:"#7cb305"}}>{this.state.balance} ETH</b></div>
             <Button type="primary" onClick={this.getUserType} className={'continue-button'}>
               Continue
             </Button>
@@ -84,9 +84,9 @@ class App extends Component {
   render() {
     if(!this.state.web3){
       return(
-        <div className="App-header">
+        <div className="App-header Loading">
           <Spin indicator={antIcon} />
-          <h2>Loading web3, accounts, and contract ...</h2>
+          <h2 style={{marginTop: 40}}>Loading web3, accounts, and contract ...</h2>
       </div>
       )
     }

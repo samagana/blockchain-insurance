@@ -29,23 +29,23 @@ class BlockExplorer extends React.Component {
 
       generateBlocks = () =>{
         return this.state.blocks.map((block, index)=>
-        <div style={{borderRadius:"2px",backgroundColor:"#096dd9",margin:`0px 0px 20px ${index > 0 ? '20px' : '0px'}`,padding:"10px"}} key={block.number}>
-            <div>B-Number: {block.number}</div>
+        <div style={{borderRadius:"2px",backgroundColor:"#08979c",margin:`10px 0px 10px ${index > 0 ? '20px' : '0px'}`,padding:"10px"}} key={block.number}>
+            <div>Block Number: {block.number}</div>
             <div>Gas Used: {block.gasUsed}</div>
-            <div>Timestamp: {block.timestamp}</div>
+            <div style={{width: 120}}>Timestamp: {this.convertTimestamp(parseInt(block.timestamp))}</div>
         </div>
         ) 
       }
 
       render(){
             return(
-                    <div style={{display:"flex",flexDirection:"row",overflowX:"auto",justifyContent:"center",alignItems:"center",color:"white",fontSize:"12px"}}>
+                    <div style={{display:"flex",flexDirection:"row",overflowX:"auto",justifyContent:"center",alignItems:"center",color:"white",fontSize:"12px",backgroundColor: "#f5f5f5"}}>
                     {
                         this.state.blocks.length>0?
                             this.generateBlocks()
                             :
-                            <div style={{borderRadius:"8px",textAlign:"center",backgroundColor:"#096dd9",margin:"0px 25px 20px 25px",padding:"10px"}}>
-                                <h3 style={{color: "#fff"}}>Loading block explorer</h3>
+                            <div style={{borderRadius:"2px",textAlign:"center",backgroundColor:"#08979c",margin:"10px 0px 10px 0px",padding:"10px", height: 95}}>
+                                <h3 style={{color: "#fff", width: 120, marginBottom: 16}}>Tracking</h3>
                                 <Spin indicator={antIcon} />
                             </div>
                     }
@@ -53,6 +53,32 @@ class BlockExplorer extends React.Component {
                 )
                 
       }
+
+      convertTimestamp = (timestamp) => {
+        var d = new Date(timestamp * 1000), // Convert the passed timestamp to milliseconds
+            yyyy = d.getFullYear(),
+            mm = ('0' + (d.getMonth() + 1)).slice(-2),  // Months are zero based. Add leading 0.
+            dd = ('0' + d.getDate()).slice(-2),         // Add leading 0.
+            hh = d.getHours(),
+            h = hh,
+            min = ('0' + d.getMinutes()).slice(-2),     // Add leading 0.
+            ampm = 'AM',
+            time;
+    
+        if (hh > 12) {
+            h = hh - 12;
+            ampm = 'PM';
+        } else if (hh === 12) {
+            h = 12;
+            ampm = 'PM';
+        } else if (hh === 0) {
+            h = 12;
+        }
+    
+        // ie: 2014-03-24, 3:00 PM
+        time = yyyy + '-' + mm + '-' + dd + ', ' + h + ':' + min + ' ' + ampm;
+        return time;
+    }
 }
 
 export default BlockExplorer;

@@ -1,6 +1,10 @@
 html, body
 {
-  width: 100%; 
+  width: 100%;
+}
+
+.App-header {
+  background-image: url("static/journal-blockchain.png"); 
 }
 
 .App {
@@ -21,6 +25,10 @@ html, body
   justify-content: center;
   flex-grow: 1;
   flex-shrink: 1;
+}
+
+.App-header.Loading {
+  height: 100vh;
 }
 
 .App-link {

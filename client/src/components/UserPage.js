@@ -58,11 +58,11 @@ class UserPage extends Component {
         return (
             <div style={{flexGrow: 1}}>
                 <div style={{display: "flex", justifyContent: "space-between"}}>
-                    <ArrowLeftOutlined onClick={this.props.onBack} style={{fontSize: 24, marginLeft: 10, marginTop: 10}}/>
-                    <span style={{marginRight: 10, marginTop: 10}}><b>Balance: </b>{this.props.balance} eth</span>
+                    <div style={{width: 300}}><ArrowLeftOutlined onClick={this.props.onBack} style={{fontSize: 32, marginLeft: 10, marginTop: 10}}/></div>
+                    <div style={{width: 300}}><h1 style={{textAlign: "center"}}>User View</h1></div>
+                    <div style={{width: 300}}><div style={{padding: "10px 10px 0px 50px"}}><b>Balance: </b>{this.props.balance} ETH</div></div>
                 </div>
                 <div style={{textAlign:"center"}}>
-                    <h1>User Page</h1>
                     <div style={{display: "flex"}}>
                         <div style={{marginLeft: 10, marginRight: 10, flexGrow: 1}}>
                             <Table 
@@ -72,7 +72,7 @@ class UserPage extends Component {
                                 loading={this.state.isInsuranceLoading}
                                 pagination={false}
                                 bordered
-                                scroll={{y: 280}}
+                                scroll={{y: 320}}
                             />
                         </div>
                         <div style={{marginLeft: 10, marginRight: 10, flexGrow: 1}}>
@@ -83,7 +83,7 @@ class UserPage extends Component {
                                 loading={this.state.isClaimsLoading}
                                 pagination={false}
                                 bordered
-                                scroll={{y: 280}}
+                                scroll={{y: 320}}
                             />
                         </div>
                     </div>
@@ -123,21 +123,20 @@ class UserPage extends Component {
                     }
                     return (
                         <div>
-                            <div><b>Premium: </b>{`${record.premium} eth`}</div>
-                            <div><b>Aggregate amount: </b>{`${record.amount} eth`}</div>
+                            <div><b>Premium: </b>{`${record.premium} ETH`}</div>
+                            <div><b>Aggregate amount: </b>{`${record.amount} ETH`}</div>
                             <div style={{marginTop: 5}}>
-                                { !record.claimed && (
-                                    <Button
-                                        style={{marginRight: 10}}
-                                        onClick={() => {
-                                            this.index = index;
-                                            this.setState({ claimDialog: true, value: '' })
-                                        }}
-                                    >Claim</Button> 
-                                )}
+                                <Button
+                                    style={{marginRight: 10}}
+                                    onClick={() => {
+                                        this.index = index;
+                                        this.setState({ claimDialog: true, value: '' })
+                                    }}
+                                    disabled={record.claimed}
+                                >Raise a Claim</Button>
                                 <Button
                                     type='primary'
-                                    style={{backgroundColor: "#52c41a"}}
+                                    style={{backgroundColor: "#52c41a", borderColor: "#52c41a"}}
                                     onClick={() => {
                                         this.index = index;
                                         this.setState({ payDialog: true, value: '' })
@@ -177,7 +176,8 @@ class UserPage extends Component {
                     } else {
                         return <div>Pending</div>
                     }
-                }
+                },
+                width: 120
             },
             {
                 title: 'Last updated',
@@ -221,7 +221,7 @@ class UserPage extends Component {
                     onCancel={() => this.setState({ claimDialog: false })}
                     confirmLoading={this.state.isLoading}
                 >
-                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1}}>Claim amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'eth'}/></div>
+                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1}}>Claim amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
                 </Modal>
             )
         } else if (this.state.payDialog) {
@@ -233,8 +233,8 @@ class UserPage extends Component {
                     onCancel={() => this.setState({ payDialog: false })}
                     confirmLoading={this.state.isLoading}
                 >
-                    <div style={{display: "flex"}}><div style={{flexGrow: 1, fontWeight: 700}}>Minimum payable: </div>{this.state.insurance[this.index].premium} eth</div>
-                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Claim amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'eth'}/></div>
+                    <div style={{display: "flex"}}><div style={{flexGrow: 1, fontWeight: 700}}>Minimum payable: </div>{this.state.insurance[this.index].premium} ETH</div>
+                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Claim amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
                 </Modal>
             )
         } else if (this.state.buyDialog) {
@@ -247,7 +247,7 @@ class UserPage extends Component {
                     confirmLoading={this.state.isLoading}
                 >
                     <div style={{display: "flex"}}><div style={{flexGrow: 1, fontWeight: 700}}>Name</div>{this.state.insurance[this.index].name}</div>
-                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Set premium</div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'eth'}/></div>
+                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Set premium</div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
                 </Modal>
             )
         }        
