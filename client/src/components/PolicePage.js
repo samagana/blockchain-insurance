@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { ArrowLeftOutlined } from '@ant-design/icons'
-import { Table, Button, Modal, Input, Space, Col , Row } from 'antd';
+import { Table, Button, Space, Col , Row } from 'antd';
 
 class PolicePage extends Component {
     constructor(props){
@@ -77,6 +77,8 @@ class PolicePage extends Component {
                     this.props.updateBalance();
                 })
                 break;
+            default:
+                return;
         }
     }
 

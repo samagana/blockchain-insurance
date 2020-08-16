@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import { ArrowLeftOutlined } from '@ant-design/icons'
 import { Table, Button, Modal, Input , Row , Col, Space } from 'antd';
-import {Grid,TextField} from "@material-ui/core";
+import {Grid} from "@material-ui/core";
 import 'antd/dist/antd.css'; 
 import "./owner.css";
 
