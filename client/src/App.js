@@ -94,7 +94,7 @@ class App extends Component {
       if(ethereum){
         ethereum.on('accountsChanged',async (accounts)=>{
           this.setState({account:accounts[0]},this.updateBalance);
-          window.location.reload();
+          // window.location.reload();
         })
       }
       return(
