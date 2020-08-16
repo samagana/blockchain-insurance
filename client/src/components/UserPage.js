@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { ArrowLeftOutlined } from '@ant-design/icons'
-import { Table, Button, Modal, Input } from 'antd';
+import { Table, Button, Modal, Input, message } from 'antd';
 
 class UserPage extends Component {
     index = -1;
@@ -46,6 +46,7 @@ class UserPage extends Component {
             return {
                 key: index + 1,
                 name: products[entry.productIndex].name,
+                amount: entry.amount,
                 approved: entry.isApproved,
                 rejected: entry.isRejected,
                 time: this.convertTimestamp(parseInt(entry.time))
@@ -133,7 +134,7 @@ class UserPage extends Component {
                                         this.setState({ claimDialog: true, value: '' })
                                     }}
                                     disabled={record.claimed}
-                                >Raise a Claim</Button>
+                                >Raise a claim</Button>
                                 <Button
                                     type='primary'
                                     style={{backgroundColor: "#52c41a", borderColor: "#52c41a"}}
@@ -165,16 +166,22 @@ class UserPage extends Component {
                 width: 150
             },
             {
+                title: 'Amount',
+                dataIndex: 'amount',
+                width: 100,
+                render: (text) => `${text} ETH`
+            },
+            {
                 title: 'Status',
                 dataIndex: 'approved',
                 key: 'status',
                 render: (text, record) => {
                     if (record.approved) {
-                        return <div>Approved</div>
+                        return <div style={{color: "#7cb305"}}>Approved</div>
                     } else if (record.rejected) {
-                        return <div>Rejected</div>
+                        return <div style={{color: "#ff4d4f"}}>Rejected</div>
                     } else {
-                        return <div>Pending</div>
+                        return <div style={{color: "#d4b106"}}>Pending</div>
                     }
                 },
                 width: 120
@@ -188,6 +195,10 @@ class UserPage extends Component {
     }
 
     applyClaim = async () => {
+        if (isNaN(this.state.value)) {
+            message.error('Invalid amount');
+            return;
+        }
         this.setState({ isLoading: true });
         await this.props.contract.methods.claimInsurance(this.index, parseInt(this.state.value)).send({ from: this.props.account });
         this.setState({ isLoading: false, claimDialog: false });
@@ -196,6 +207,14 @@ class UserPage extends Component {
     }
 
     payPremium = async () => {
+        if (isNaN(this.state.value)) {
+            message.error('Invalid amount');
+            return;
+        }
+        if (parseFloat(this.state.value) < parseFloat(this.state.insurance[this.index].premium)) {
+            message.error('Amount less than minimum payable');
+            return;
+        }
         this.setState({ isLoading: true });
         await this.props.contract.methods.payPremium(this.index).send({ from: this.props.account, value: this.props.web3.utils.toWei(this.state.value) });
         this.setState({ isLoading: false, payDialog: false });
@@ -204,6 +223,10 @@ class UserPage extends Component {
     }
 
     buyInsurance = async () => {
+        if (isNaN(this.state.value)) {
+            message.error('Invalid amount');
+            return;
+        }
         this.setState({ isLoading: true });
         await this.props.contract.methods.buyInsurance(this.index, this.props.web3.utils.toWei(this.state.value)).send({ from: this.props.account });
         this.setState({ isLoading: false, buyDialog: false });
@@ -212,46 +235,40 @@ class UserPage extends Component {
     }
 
     getModal = () => {
-        if (this.state.claimDialog) {
-            return (
+        return (
+            <div>
                 <Modal
                     title={'Apply for a claim'}
-                    visible={true}
+                    visible={this.state.claimDialog}
                     onOk={this.applyClaim}
                     onCancel={() => this.setState({ claimDialog: false })}
                     confirmLoading={this.state.isLoading}
                 >
-                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1}}>Claim amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
+                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Claim amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
                 </Modal>
-            )
-        } else if (this.state.payDialog) {
-            return (
                 <Modal
                     title={'Pay premium'}
-                    visible={true}
+                    visible={this.state.payDialog}
                     onOk={this.payPremium}
                     onCancel={() => this.setState({ payDialog: false })}
                     confirmLoading={this.state.isLoading}
                 >
-                    <div style={{display: "flex"}}><div style={{flexGrow: 1, fontWeight: 700}}>Minimum payable: </div>{this.state.insurance[this.index].premium} ETH</div>
-                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Claim amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
+                    <div style={{display: "flex"}}><div style={{flexGrow: 1, fontWeight: 700}}>Minimum payable: </div>{this.state.insurance[this.index] ? this.state.insurance[this.index].premium : null} ETH</div>
+                    <div style={{display: "flex", marginTop: 4}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Premium amount: </div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
                 </Modal>
-            )
-        } else if (this.state.buyDialog) {
-            return (
                 <Modal
                     title={'Buy insurance'}
-                    visible={true}
+                    visible={this.state.buyDialog}
                     onOk={this.buyInsurance}
                     onCancel={() => this.setState({ buyDialog: false })}
                     confirmLoading={this.state.isLoading}
                 >
-                    <div style={{display: "flex"}}><div style={{flexGrow: 1, fontWeight: 700}}>Name</div>{this.state.insurance[this.index].name}</div>
-                    <div style={{display: "flex"}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Set premium</div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
+                    <div style={{display: "flex"}}><div style={{flexGrow: 1, fontWeight: 700}}>Product Name:</div>{this.state.insurance[this.index] ? this.state.insurance[this.index].name : null}</div>
+                    <div style={{display: "flex", marginTop: 4}}><div style={{flexGrow: 1, fontWeight: 700}}>Product ID:</div>{this.index + 1}</div>
+                    <div style={{display: "flex", marginTop: 4}}><div style={{marginTop: 3, flexGrow: 1, fontWeight: 700}}>Set premium:</div><Input value={this.state.value} onChange={(e) => this.setState({ value: e.target.value })} style={{width: "auto"}} addonAfter={'ETH'}/></div>
                 </Modal>
-            )
-        }        
-        return null;
+            </div>
+        );
     }
 
     convertTimestamp = (timestamp) => {

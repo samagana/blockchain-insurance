@@ -69,7 +69,7 @@ class App extends Component {
         return (
           <div className="App-header">
             <h1>Welcome to <b style={{color:"#7cb305"}}>In-Sol-Ution</b></h1>
-            <p>A simple insurance system built with the technology of <b>blockchain</b></p>
+            <p>An insurance system built with the technology of <b>blockchain</b></p>
             <h2>We use <b style={{color:"#faad14"}}>Metamask</b> as our Web3 provider</h2>
             <p>You can change the account whenever required and we will automatically update the same in our application</p>
             <div><b>User: </b><b style={{color:"#7cb305"}}>{this.state.account}</b><b>, Balance:  </b><b style={{color:"#7cb305"}}>{this.state.balance} ETH</b></div>
