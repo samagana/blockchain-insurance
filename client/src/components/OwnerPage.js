@@ -118,14 +118,12 @@ class OwnerPage extends Component {
                             <Grid direction="row" container item justify="center" alignItems="center" spacing={10}>
                                 <Grid item style={{textAlign:"center",backgroundColor:"#096dd9",color:"white"}}>
                                     <h2 style={{fontSize:"35px",lineHeight:0.1,color:"#ffffff"}}>{this.props.balance.toFixed(3)} <span style={{fontSize:"15px"}}>ETH</span></h2>
-                                    <p style={{color:"#cccccc"}}>Account Balance </p>
+                                    <p style={{color:"#fcfcfc"}}>Account Balance </p>
                                 </Grid>
                                 <Grid item/>
                                 <Grid item style={{textAlign:"center",backgroundColor:"#096dd9"}}>
-                                    <h2 style={{fontSize:"35px",lineHeight:0.1,color:"#ffffff"}}>{this.state.contractBalance.toFixed(3)}</h2>
-                                    <p style={{color:"#cccccc"}}>
-                                    Contract Balance (in ETH)
-                                    </p>
+                                    <h2 style={{fontSize:"35px",lineHeight:0.1,color:"#ffffff"}}>{this.state.contractBalance.toFixed(3)} <span style={{fontSize:"15px"}}>ETH</span></h2>
+                                    <p style={{color:"#fcfcfc"}}>Contract Balance</p>
                                 </Grid>
                             </Grid>
                     </React.Fragment>
