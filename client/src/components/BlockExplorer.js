@@ -29,8 +29,8 @@ class BlockExplorer extends React.Component {
 
       generateBlocks = () =>{
         return this.state.blocks.map((block, index)=>
-        <div style={{borderRadius:"2px",backgroundColor:"#08979c",margin:`10px 0px 10px ${index > 0 ? '20px' : '0px'}`,padding:"10px"}} key={block.number}>
-            <div>Block Number: {block.number}</div>
+        <div style={{borderRadius:"2px",backgroundColor:"#096dd9",padding:"10px"}} key={block.number}>
+            <div>B-Number: {block.number}</div>
             <div>Gas Used: {block.gasUsed}</div>
             <div style={{width: 120}}>Timestamp: {this.convertTimestamp(parseInt(block.timestamp))}</div>
         </div>
@@ -39,7 +39,7 @@ class BlockExplorer extends React.Component {
 
       render(){
             return(
-                    <div style={{display:"flex",flexDirection:"row",overflowX:"auto",justifyContent:"center",alignItems:"center",color:"white",fontSize:"12px",backgroundColor: "#f5f5f5"}}>
+                    <div style={{position:"absolute",bottom:"10px",display:"inline-flex",gap:"30px",width:"100%",flexDirection:"row",overflowX:"auto",justifyContent:"center",alignItems:"center",color:"white",fontSize:"12px"}}>
                     {
                         this.state.blocks.length>0?
                             this.generateBlocks()

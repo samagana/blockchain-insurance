@@ -8,6 +8,7 @@ contract Insurance {
     Product[] private products;
     Claim[] private allClaims;
     mapping(address => mapping(uint8 => InsuranceDetails)) private insurance;
+    mapping(address => Claim[]) private myClaims;
     
     constructor(address _police) public {
         owner = msg.sender;
@@ -73,15 +74,16 @@ contract Insurance {
     }
 
     function getMyClaims() public view returns(Claim[] memory) {
-        Claim[] memory tempClaims = new Claim[](allClaims.length);
-        uint k = 0;
-        for (uint i=0; i<allClaims.length; i++) {
-            if (allClaims[i].claimedBy == msg.sender) {
-                tempClaims[k] = allClaims[i];
-                k = k + 1;
-            }
-        }
-        return tempClaims;
+        // Claim[] memory tempClaims = new Claim[](allClaims.length);
+        // uint k = 0;
+        // for (uint i=0; i<allClaims.length; i++) {
+        //     if (allClaims[i].claimedBy == msg.sender) {
+        //         tempClaims[k] = allClaims[i];
+        //         k = k + 1;
+        //     }
+        // }
+        // return tempClaims;
+        return myClaims[msg.sender];
     }
 
     function getAllClaims() public view isPolicyOrOwner returns(Claim[] memory) {
@@ -104,6 +106,7 @@ contract Insurance {
         require(insurance[msg.sender][productIndex].isPurchased, "Insurance not purchased yet");
         require(!insurance[msg.sender][productIndex].isClaimed, "Insurance already claimed");
         insurance[msg.sender][productIndex].isClaimed = true;
+        myClaims[msg.sender].push(Claim(productIndex, amount, msg.sender, false, false, now));
         allClaims.push(Claim(productIndex, amount, msg.sender, false, false, now));
     }
     
@@ -113,9 +116,11 @@ contract Insurance {
         require(!allClaims[claimId].isRejected, "Claim already rejected!");
         allClaims[claimId].isApproved = true;
         allClaims[claimId].time = now;
+        myClaims[address(allClaims[claimId].claimedBy)][claimId].isApproved = true;
+        myClaims[address(allClaims[claimId].claimedBy)][claimId].time = now;
         insurance[allClaims[claimId].claimedBy][allClaims[claimId].productIndex].isClaimed = false;
         address payable claimer = address(uint160(allClaims[claimId].claimedBy));
-        claimer.transfer(allClaims[claimId].amount);
+        claimer.transfer(myClaims[address(allClaims[claimId].claimedBy)][claimId].amount);
     }
 
     function rejectInsurance(uint8 claimId) public isPolice {
@@ -124,6 +129,8 @@ contract Insurance {
         require(!allClaims[claimId].isRejected, "Claim already rejected!");
         allClaims[claimId].isRejected = true;
         allClaims[claimId].time = now;
+        myClaims[address(allClaims[claimId].claimedBy)][claimId].isRejected = true;
+        myClaims[address(allClaims[claimId].claimedBy)][claimId].time = now;
         insurance[allClaims[claimId].claimedBy][allClaims[claimId].productIndex].isClaimed = false;
     }
     
@@ -142,6 +149,10 @@ contract Insurance {
     
     function addFunds() public payable isOwner {
         //
+    }
+
+    function transferToOwner() public isOwner{
+        owner.transfer(address(this).balance);
     }
     
     function getBalance() public view isOwner returns (uint256) {
