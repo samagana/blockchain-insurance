@@ -62,7 +62,7 @@ class App extends Component {
       case "owner":
         return <OwnerPage onBack={this.backHome} updateBalance={this.updateBalance} {...this.state}/>
       case "police":
-        return <PolicePage />
+        return <PolicePage onBack={this.backHome} updateBalance={this.updateBalance} {...this.state}/>
       case "user":
         return <UserPage onBack={this.backHome} account={this.state.account} contract={this.state.contract} balance={this.state.balance} web3={this.state.web3} updateBalance={this.updateBalance}/>
       default:
@@ -93,7 +93,8 @@ class App extends Component {
       const ethereum = window.ethereum;
       if(ethereum){
         ethereum.on('accountsChanged',async (accounts)=>{
-          this.setState({account:accounts[0]},this.updateBalance);
+          // this.setState({account:accounts[0]},this.updateBalance);
+          window.location.reload();
         })
       }
       return(

@@ -105,6 +105,17 @@ class OwnerPage extends Component {
         this.setState({ insurance, isInsuranceLoading: false });
     }
 
+    transferToOwner=()=>{
+        const {account,contract} = this.props;
+        contract.methods.transferToOwner().send({from:account}).then(resp=>{
+            this.getContractBalance();
+            this.props.updateBalance();
+        })
+        .catch(err =>{
+            alert("Insufficient Balance");
+        })
+    }
+
     render(){
         const { visible, confirmLoading, ModalText } = this.state;
         return(
@@ -119,11 +130,27 @@ class OwnerPage extends Component {
                                 <Grid item style={{textAlign:"center",backgroundColor:"#096dd9",color:"white"}}>
                                     <h2 style={{fontSize:"35px",lineHeight:0.1,color:"#ffffff"}}>{this.props.balance.toFixed(3)} <span style={{fontSize:"15px"}}>ETH</span></h2>
                                     <p style={{color:"#fcfcfc"}}>Account Balance </p>
+                                    <Space size={2}>
+                                                <Col>
+                                                    <Input 
+                                                        type="number"
+                                                        prefix="ETH" 
+                                                        onChange={(event)=>this.setState({amountToLoad: event.target.value})}
+                                                        value={this.state.amountToLoad}
+                                                    />
+                                                </Col>
+                                                <Col>
+                                                    <Button style={{backgroundColor:"#0ad48b"}} onClick={this.addFunds}>Deposit Ether</Button>
+                                                </Col>
+                                    </Space>
+                                    <p style={{color:"#dddddd"}}>Money will be trasnfered from <b>Your account</b> to <b>Contract</b></p>            
                                 </Grid>
                                 <Grid item/>
                                 <Grid item style={{textAlign:"center",backgroundColor:"#096dd9"}}>
                                     <h2 style={{fontSize:"35px",lineHeight:0.1,color:"#ffffff"}}>{this.state.contractBalance.toFixed(3)} <span style={{fontSize:"15px"}}>ETH</span></h2>
                                     <p style={{color:"#fcfcfc"}}>Contract Balance</p>
+                                    <Button style={{backgroundColor:"#0ad48b"}} onClick={this.transferToOwner}>Redeem</Button>
+                                    <p style={{color:"#dddddd"}}>Money will be trasnfered from <b>Contract</b> to <b>Your account</b></p>  
                                 </Grid>
                             </Grid>
                     </React.Fragment>
@@ -151,23 +178,6 @@ class OwnerPage extends Component {
                                                 </Col>
                                                 <Col>
                                                     <Button type="primary" onClick={this.addProduct}>Add Product</Button>
-                                                </Col>
-                                            </Space>
-                                        </Row>
-                                    </Col>
-                                    <Col>
-                                        <Row>
-                                            <Space size={10}> 
-                                                <Col>
-                                                    <Input 
-                                                        type="number"
-                                                        prefix="ETH" 
-                                                        onChange={(event)=>this.setState({amountToLoad: event.target.value})}
-                                                        value={this.state.amountToLoad}
-                                                    />
-                                                </Col>
-                                                <Col>
-                                                    <Button style={{backgroundColor:"#0ad48b"}} onClick={this.addFunds}>Deposit Ether</Button>
                                                 </Col>
                                             </Space>
                                         </Row>

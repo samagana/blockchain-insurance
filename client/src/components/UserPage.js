@@ -42,6 +42,7 @@ class UserPage extends Component {
         this.setState({ insurance, isInsuranceLoading: false });
 
         const myClaims = (await this.props.contract.methods.getMyClaims().call({from: this.props.account})).filter((item) => item.claimedBy !== 0);
+        console.log(myClaims);
         var claims = myClaims.map((entry, index) => {
             return {
                 key: index + 1,
