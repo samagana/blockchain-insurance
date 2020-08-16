@@ -116,11 +116,11 @@ contract Insurance {
         require(!allClaims[claimId].isRejected, "Claim already rejected!");
         allClaims[claimId].isApproved = true;
         allClaims[claimId].time = now;
-        myClaims[allClaims[claimId].claimedBy][claimId].isApproved = true;
-        myClaims[allClaims[claimId].claimedBy][claimId].time = now;
+        myClaims[address(allClaims[claimId].claimedBy)][claimId].isApproved = true;
+        myClaims[address(allClaims[claimId].claimedBy)][claimId].time = now;
         insurance[allClaims[claimId].claimedBy][allClaims[claimId].productIndex].isClaimed = false;
         address payable claimer = address(uint160(allClaims[claimId].claimedBy));
-        claimer.transfer(allClaims[claimId].amount);
+        claimer.transfer(myClaims[address(allClaims[claimId].claimedBy)][claimId].amount);
     }
 
     function rejectInsurance(uint8 claimId) public isPolice {
@@ -129,6 +129,8 @@ contract Insurance {
         require(!allClaims[claimId].isRejected, "Claim already rejected!");
         allClaims[claimId].isRejected = true;
         allClaims[claimId].time = now;
+        myClaims[address(allClaims[claimId].claimedBy)][claimId].isRejected = true;
+        myClaims[address(allClaims[claimId].claimedBy)][claimId].time = now;
         insurance[allClaims[claimId].claimedBy][allClaims[claimId].productIndex].isClaimed = false;
     }
     

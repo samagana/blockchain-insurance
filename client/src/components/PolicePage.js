@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { ArrowLeftOutlined } from '@ant-design/icons'
-import { Table, Button, Space, Col , Row } from 'antd';
+import { Table, Button, Space, Col , Row, message } from 'antd';
 
 class PolicePage extends Component {
     constructor(props){
@@ -43,7 +43,7 @@ class PolicePage extends Component {
         const {contract,account} = this.props;
         this.setState({ isClaimsLoading: true});
         const products = await this.props.contract.methods.getProducts().call({from: this.props.account});
-        const allClaims = (await contract.methods.getAllClaims().call({from:account})).map((item)=>Object.assign({},item)).filter(item => !item.isApproved && !item.isRejected);
+        const allClaims = (await contract.methods.getAllClaims().call({from:account})).map((item)=>Object.assign({},item))
         const claims = allClaims.map((entry, index) => {
             return {
                 key: index + 1,
@@ -53,7 +53,7 @@ class PolicePage extends Component {
                 claimedBy: entry.claimedBy,
                 time: this.convertTimestamp(parseInt(entry.time))
             }
-        });
+        }).filter(item => !item.approved && !item.rejected);
         console.log(claims);
         this.setState({claims,isClaimsLoading:false});
     }
@@ -64,17 +64,26 @@ class PolicePage extends Component {
 
     takeAction =(type,record)=>{
         const {contract,account} = this.props;
+        console.log(record);
         switch(type){
             case "approve":
                     contract.methods.approveInsurance(record.key-1).send({from:account}).then(()=>{
                         this.updateData();
                         this.props.updateBalance();
+                        message.success("Transaction Successful");
+                    })
+                    .catch(err=>{
+                        message.error(err.message);
                     })
                 break;
             case "reject":
                 contract.methods.rejectInsurance(record.key-1).send({from:account}).then(()=>{
                     this.updateData();
                     this.props.updateBalance();
+                    message.success("Transaction Successful");
+                })
+                .catch(err=>{
+                    message.error(err.message);
                 })
                 break;
             default:

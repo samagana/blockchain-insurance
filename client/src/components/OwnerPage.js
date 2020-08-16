@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { ArrowLeftOutlined } from '@ant-design/icons'
-import { Table, Button, Modal, Input , Row , Col, Space } from 'antd';
+import { Table, Button, Modal, Input , Row , Col, Space , message} from 'antd';
 import {Grid} from "@material-ui/core";
 import 'antd/dist/antd.css'; 
 import "./owner.css";
@@ -55,24 +55,22 @@ class OwnerPage extends Component {
 
     addFunds=()=>{
         const {account,contract} = this.props;
+        if(this.state.amountToLoad === 0){
+            message.error("Invalid Amount");
+            return;
+        }
         this.setState({isDepositLoading:true});
-        if(this.state.amountToLoad!==0){
             var amount = this.props.web3.utils.toWei(this.state.amountToLoad,'ether')
             contract.methods.addFunds().send({from:account,value:amount}).then(resp=>{
                 this.getContractBalance();
                 this.props.updateBalance();
                 this.setState({isDepositLoading:false,amountToLoad:0});
+                message.success("Transaction Successful");
             })
             .catch(err=>{
                 this.setState({isDepositLoading:false,amountToLoad:0});
-                alert(err.message);
-                console.log(err);
+                message.error(err.message);
             })
-        }
-        else{
-            this.setState({isDepositLoading:false});
-            alert("Amount cannot be empty!")
-        }
     }
 
     getInsuranceColumns=()=>{
@@ -91,23 +89,23 @@ class OwnerPage extends Component {
     }
 
     addProduct = async () =>{
+        if(this.state.productToAdd === ""){
+            message.error("Product Name cannot be Empty")
+            return;
+        }
         const {account,contract} = this.props;
         this.setState({isProductLoading:true});
-        if(this.state.productToAdd!=="")
             contract.methods.addProduct(this.state.productToAdd).send({from:account}).then(resp=>{
                 this.setState({productToAdd:""});
                 this.updateData();
                 this.props.updateBalance();
                 this.setState({isProductLoading:false});
+                message.success("Transaction Successful");
             })
             .catch(err=>{
-                alert(err.message);
+                message.error(err.message);
                 this.setState({isProductLoading:false});
             })
-        else{
-            alert("Product name cannot be empty!");
-            this.setState({isProductLoading:false});
-        }
     }
 
     updateData= async ()=>{
@@ -130,11 +128,12 @@ class OwnerPage extends Component {
         contract.methods.transferToOwner().send({from:account}).then(resp=>{
             this.getContractBalance();
             this.props.updateBalance();
+            message.success("Transaction Successful");
             this.setState({isRedeemLoading:false});
         })
         .catch(err =>{
             this.setState({isRedeemLoading:false});
-            alert("Insufficient Balance");
+            message.error(err.message);
         })
     }
 
@@ -184,7 +183,7 @@ class OwnerPage extends Component {
                             loading={this.state.isInsuranceLoading}
                             pagination={false}
                             bordered
-                            scroll={{y: 280}}
+                            scroll={{y: 170}}
                         />
                             <div className="App-Content" style={{flexGrow:1,display:"flex", alignItems:"center",marginTop:30,width:"100%"}}>
                                 <Row>

@@ -201,7 +201,7 @@ class UserPage extends Component {
             return;
         }
         this.setState({ isLoading: true });
-        await this.props.contract.methods.claimInsurance(this.index, parseInt(this.state.value)).send({ from: this.props.account });
+        await this.props.contract.methods.claimInsurance(this.index, this.props.web3.utils.toWei(this.state.value,"ether")).send({ from: this.props.account });
         this.setState({ isLoading: false, claimDialog: false });
         this.updateData();
         this.props.updateBalance();
@@ -217,7 +217,7 @@ class UserPage extends Component {
             return;
         }
         this.setState({ isLoading: true });
-        await this.props.contract.methods.payPremium(this.index).send({ from: this.props.account, value: this.props.web3.utils.toWei(this.state.value) });
+        await this.props.contract.methods.payPremium(this.index).send({ from: this.props.account, value: this.props.web3.utils.toWei(this.state.value,"ether") });
         this.setState({ isLoading: false, payDialog: false });
         this.updateData();
         this.props.updateBalance();
@@ -229,7 +229,7 @@ class UserPage extends Component {
             return;
         }
         this.setState({ isLoading: true });
-        await this.props.contract.methods.buyInsurance(this.index, this.props.web3.utils.toWei(this.state.value)).send({ from: this.props.account });
+        await this.props.contract.methods.buyInsurance(this.index, this.props.web3.utils.toWei(this.state.value,"ether")).send({ from: this.props.account });
         this.setState({ isLoading: false, buyDialog: false });
         this.updateData();
         this.props.updateBalance();
