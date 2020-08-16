@@ -11,7 +11,7 @@ class PolicePage extends Component {
     render(){
         return(
             <div style={{textAlign:"center"}}>
-                <h1>Police Page</h1>
+                <div>Police Page</div>
             </div>
         )
     }

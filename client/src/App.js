@@ -49,7 +49,7 @@ class App extends Component {
   updateBalance = () => {
     const {web3,account} = this.state;
     web3.eth.getBalance(account, (err, balance) => {
-      this.setState({balance:web3.utils.fromWei(balance, "ether")});
+      this.setState({balance:parseFloat(web3.utils.fromWei(balance, "ether"))});
     });
   };
 
@@ -60,7 +60,7 @@ class App extends Component {
   getContent =()=>{
     switch(this.state.type){
       case "owner":
-        return <OwnerPage />
+        return <OwnerPage onBack={this.backHome} updateBalance={this.updateBalance} {...this.state}/>
       case "police":
         return <PolicePage />
       case "user":
