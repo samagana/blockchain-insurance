@@ -147,5 +147,9 @@ contract Insurance {
     function getBalance() public view isOwner returns (uint256) {
         return address(this).balance;
     }
+    
+    function transferToOwner() public isOwner {
+        owner.transfer(address(this).balance);
+    }
 
 }
