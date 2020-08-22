@@ -1,2 +1,3 @@
-# simple-insurance
-Simple insurance system using blockchain
+# Ethereum based Insurance system
+
+An ethereum based Insurance system that we call InSolUtion (Insurance-Solidity)
